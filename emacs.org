@@ -1,0 +1,242 @@
+#+title Emacs config file
+#+PROPERTY: header-args:emacs-lisp :tangle ~/.emacs.d/init.el mkdirp yes
+
+* Custom variables and functions
+** Variables
+
+#+begin_src emacs-lisp
+
+(defvar rk/default-font-size 120)
+
+#+end_src
+
+** Functions
+
+#+begin_src emacs-lisp
+
+(defun rk/org-font-setup ()
+  ;; Replace list hyphen with dot in org mode
+  (font-lock-add-keywords 'org-mode
+			  '(("^ *\\([-]\\) "
+			     (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
+
+  ;; Set faces for heading levels
+  (dolist (face '((org-level-1 . 1.2)
+		  (org-level-2 . 1.1)
+		  (org-level-3 . 1.05)
+		  (org-level-4 . 1.0)
+		  (org-level-5 . 1.1)
+		  (org-level-6 . 1.1)
+		  (org-level-7 . 1.1)
+		  (org-level-8 . 1.1)))))
+
+(defun rk/org-mode-setup ()
+  ;; Fix org mode indentation and line wrapping
+  (org-indent-mode)
+  (visual-line-mode 1))
+
+(defun rk/org-babel-tangle-config ()
+  ;; Automatically generate init file on save
+  (when (string-equal (buffer-file-name)
+		      (expand-file-name "~/Projects/emacs-config/emacs.org"))
+    ;; Dynamic scoping to the rescue
+    (let ((org-confirm-babel-evaluate nil))
+      (org-babel-tangle))))
+
+#+end_src
+
+* Package sources
+** Package archives
+
+#+begin_src emacs-lisp
+
+(require 'package)
+
+(setq package-archives '(("melpa" . "https://melpa.org/packages/")
+			 ("org" . "https://orgmode.org/elpa/")
+			 ("elpa" . "https://elpa.gnu.org/packages/")))
+
+(package-initialize)
+(unless package-archive-contents
+  (package-refresh-contents))
+
+#+end_src
+   
+** Activate use-package
+
+#+begin_src emacs-lisp
+
+(unless (package-installed-p 'use-package)
+  (package-install 'use-package))
+
+(require 'use-package)
+(setq use-package-always-ensure t)
+
+#+end_src
+
+* Basic UI Configuration
+** Main buffer look
+
+#+begin_src emacs-lisp
+
+(setq inhibit-startup-message t)                ; Disable startup message
+(add-hook 'window-setup-hook 'toggle-frame-maximized t) ; Start maximized
+(scroll-bar-mode -1)                            ; Disable visible scrollbar
+(tool-bar-mode -1)                              ; Disable toolbar
+(tooltip-mode -1)                               ; Disable tooltips
+(set-fringe-mode 10)                            ; Margins along the sides
+(menu-bar-mode -1)                              ; Remove menu bar
+(set-face-attribute 'default nil :height rk/default-font-size)   ; Font size
+(column-number-mode)                            ; Enable column numbers
+(global-display-line-numbers-mode t)            ; Enable line numbers
+(dolist (mode '(eshell-mode-hook                ; Disable line nums for
+		org-mode-hook                       ; some modes
+		shell-mode-hook
+		term-mode-hook))
+  (add-hook mode (lambda () (display-line-numbers-mode 0))))
+
+(use-package rainbow-delimiters
+  :hook (prog-mode . rainbow-delimiters-mode))
+
+#+end_src
+
+** Mode line
+
+#+begin_src emacs-lisp
+
+(use-package all-the-icons)                     ; Icons for doom mode line
+
+(use-package doom-modeline                      ; Enable doom mode line
+  :ensure t
+  :init (doom-modeline-mode 1))
+
+(use-package doom-themes                        ; Get more themes
+  :config
+  (load-theme 'doom-nord t))
+
+#+end_src
+
+* Mini-buffer completion
+** Ivy and counsel for alternative completion
+
+#+begin_src emacs-lisp
+
+;; Setup ivy (mini-buffer completion)
+(use-package ivy
+  :diminish
+  :bind(("C-s" . swiper)
+	:map ivy-minibuffer-map
+	("TAB" . ivy-alt-done)
+	("C-l" . ivy-alt-done)
+	("C-n" . ivy-next-line)
+	("C-p" . ivy-previous-line)
+	:map ivy-switch-buffer-map
+	("C-n" . ivy-next-line)
+	("C-l" . ivy-done)
+	("C-d" . ivy-switch-buffer-kill)
+	:map ivy-reverse-i-search-map
+	("C-p" . ivy-previous-line)
+	("C-d" . ivy-reverse-i-search-kill))
+  :config
+  (ivy-mode 1))
+
+;; Completions for key bindings
+(use-package which-key
+  :init (which-key-mode)
+  :diminish which-key-mode
+  :config
+  (setq which-key-idle-delay 2))
+
+;; Counsel required for ivy-rich. Also some basic setup
+(use-package counsel
+  :bind (("M-x" . counsel-M-x)
+	 ("C-x b" . counsel-ibuffer)
+	 ("C-x C-f" . counsel-find-file)
+	 :map minibuffer-local-map
+	 ("C-r" . 'counsel-minibuffer-history)))
+
+;; Descriptions of key bindings with M-x
+(use-package ivy-rich
+  :init
+  (ivy-rich-mode 1))
+
+#+end_src
+
+** More verbose help
+
+#+begin_src emacs-lisp
+
+(use-package helpful
+  :custom
+  (counsel-describe-function-function #'helpful-callable)
+  (counsel-describe-variable-function #'helpful-variable)
+  :bind
+  ([remap describe-function] . counsel-describe-function)
+  ([remap describe-command] . helpful-command)
+  ([remap describe-variable] . counsel-describe-variable)
+  ([remap describe-key] . helpful-key))
+
+#+end_src
+
+* Project management tools
+** Projectile for searching and moving between projects
+
+#+begin_src emacs-lisp
+
+(use-package projectile
+  :diminish
+  :config (projectile-mode)
+  :custom ((projectile-completion-system 'ivy))
+  :bind-keymap
+  ("C-c p" . projectile-command-map)
+  :init
+  (when (file-directory-p "~/Projects")
+    (setq projectile-project-search-path '("~/Projects")))
+  (setq projectile-switch-project-action #'projectile-dired))
+;; Counsel-projectile provides nice features like ripgrep
+(use-package counsel-projectile
+  :config (counsel-projectile-mode)
+  :bind (("C-c s" . counsel-projectile-rg)))
+
+#+end_src
+
+** Magit for easy access to git commands
+
+#+begin_src emacs-lisp
+
+(use-package magit
+  :custom
+  (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
+
+#+end_src
+
+* Org mode setup
+Only using org mode for documentation. Not yet for agendas etc.
+** Customization
+
+#+begin_src emacs-lisp
+
+(use-package org
+  :hook (org-mode . rk/org-mode-setup)
+  :config
+  (setq org-ellipsis " ▼")
+  (rk/org-font-setup))
+
+(use-package org-bullets
+  :hook (org-mode . org-bullets-mode)
+  :custom
+  (org-bullets-bullet-list '("◉" "○" "●" "○" "●" "○" "●")))
+
+(require 'org-tempo)                               ; required for org>9.2
+
+(add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
+
+#+end_src
+
+** Auto-tangle org file
+
+#+begin_src emacs-lisp
+
+(add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook #'rk/org-babel-tangle-config)))
+
+#+end_src
