@@ -1,5 +1,5 @@
 #+title Emacs config file
-#+PROPERTY: header-args:emacs-lisp :tangle ~/.emacs.d/init.el mkdirp yes
+#+PROPERTY: header-args:emacs-lisp :tangle ~/.emacs.d/init.el :mkdirp yes
 
 * Custom variables and functions
 ** Variables
@@ -74,7 +74,7 @@
 
 #+end_src
 
-* Basic UI Configuration
+* Basic UI configuration
 ** Main buffer look
 
 #+begin_src emacs-lisp
@@ -178,6 +178,29 @@
 
 #+end_src
 
+* Modes I use frequently for programming
+** Primary heavy-duty modes
+
+#+begin_src emacs-lisp
+
+(use-package web-mode
+  :mode "\\.html\\'")
+
+(use-package typescript-mode)
+
+(use-package js2-mode
+  :mode "\\.js\\'")
+
+#+end_src
+
+** Supporting modes
+
+#+begin_src emacs-lisp
+
+(use-package json-mode)
+
+#+end_src
+
 * Project management tools
 ** Projectile for searching and moving between projects
 
@@ -210,6 +233,20 @@
 
 #+end_src
 
+** Prettier for formatting js project files
+
+#+begin_src emacs-lisp
+
+(use-package prettier-js
+  :commands (prettier-js-mode)
+  :config
+  (setq prettier-js-args
+	`(,(concat "--config " (concat "/home/dev/Projects/usq/usq_api/.prettierrc"))      ; this works if I only have one prettierrc file. Need a better solution
+	  "--write"))
+  :hook (web-mode js2-mode typescript-mode))
+
+#+end_src
+
 * Org mode setup
 Only using org mode for documentation. Not yet for agendas etc.
 ** Customization
@@ -220,7 +257,9 @@ Only using org mode for documentation. Not yet for agendas etc.
   :hook (org-mode . rk/org-mode-setup)
   :config
   (setq org-ellipsis " ▼")
+  (setq org-src-preserve-indentation t)
   (rk/org-font-setup))
+
 
 (use-package org-bullets
   :hook (org-mode . org-bullets-mode)
