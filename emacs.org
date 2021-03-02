@@ -8,6 +8,8 @@
 
 (defvar rk/default-font-size 120)
 
+(defvar rk/usq_api_path "/home/dev/Projects/usq/usq_api")
+
 #+end_src
 
 ** Functions
@@ -240,10 +242,11 @@
 (use-package prettier-js
   :commands (prettier-js-mode)
   :config
+  (setq prettier-js-command (concat rk/usq_api_path "/node_modules/.bin/prettier"))  ; cannot find local installation otherwise
   (setq prettier-js-args
-	`(,(concat "--config " (concat "/home/dev/Projects/usq/usq_api/.prettierrc"))      ; this works if I only have one prettierrc file. Need a better solution
+	`(,(concat "--config " (concat rk/usq_api_path "/.prettierrc"))        ; this works if I only have one prettierrc file. Need a better solution
 	  "--write"))
-  :hook (web-mode js2-mode typescript-mode))
+  :hook (js2-mode typescript-mode))
 
 #+end_src
 
