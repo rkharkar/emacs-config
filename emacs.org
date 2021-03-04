@@ -180,26 +180,61 @@
 
 #+end_src
 
-* Modes I use frequently for programming
-** Primary heavy-duty modes
+* Development
+** Modes for languages
 
 #+begin_src emacs-lisp
 
-(use-package web-mode
-  :mode "\\.html\\'")
-
-(use-package typescript-mode)
-
 (use-package js2-mode
-  :mode "\\.js\\'")
+  :mode "\\.js\\'"
+  :hook (js2-mode . lsp-deferred)
+  :config
+  (setq js2-indent-level 2)
+  (setq electric-indent-inhibt t))
+
+(use-package json-mode)
+
+(use-package ng2-mode
+    :mode
+    (("\\.html\\'" . ng2-html-mode)
+     ("\\.ts\\'" . ng2-ts-mode))
+    :hook
+    ((ng2-html-mode . lsp-deferred)
+     (ng2-ts-mode . lsp-deferred)))
 
 #+end_src
 
-** Supporting modes
+** Language Servers
 
 #+begin_src emacs-lisp
 
-(use-package json-mode)
+(use-package lsp-mode
+  :commands (lsp lsp-deferred)
+  :init
+  (setq lsp-keymap-prefix "C-c l")
+  :config
+  (lsp-enable-which-key-integration t))
+
+#+end_src
+
+** Code completion with Company
+
+#+begin_src emacs-lisp
+
+(use-package company
+  :after lsp-mode
+  :hook (lsp-mode . company-mode)
+  :bind
+  (:map company-active-map
+	("<tab>" . company-complete-selection))
+  (:map lsp-mode-map
+	("<tab>" . company-indent-or-complete-common))
+  :custom
+  (company-minimum-prefix-length 1)
+  (company-idle-delay 0.0))
+
+(use-package company-box
+  :hook (company-mode . company-box-mode))
 
 #+end_src
 
@@ -282,3 +317,4 @@ Only using org mode for documentation. Not yet for agendas etc.
 (add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook #'rk/org-babel-tangle-config)))
 
 #+end_src
+
