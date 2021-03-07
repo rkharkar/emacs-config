@@ -190,9 +190,11 @@
   :hook (js2-mode . lsp-deferred)
   :config
   (setq js2-indent-level 2)
-  (setq electric-indent-inhibt t))
+  (setq electric-indent-inhibit t))
 
-(use-package json-mode)
+(use-package json-mode
+  :config
+  (setq js-indent-level 2))
 
 (use-package ng2-mode
     :mode
@@ -212,12 +214,16 @@
   :commands (lsp lsp-deferred)
   :init
   (setq lsp-keymap-prefix "C-c l")
+  (setq gc-cons-threshold 100000000)
+  (setq read-process-output-max (* 1024 1024)) ;; 1mb
+  (setq lsp-file-watch-threshold 10000)
   :config
-  (lsp-enable-which-key-integration t))
+  (lsp-enable-which-key-integration t)
+)
 
 #+end_src
 
-** Code completion with Company
+** Code completion with Company and Yasnippet
 
 #+begin_src emacs-lisp
 
@@ -235,6 +241,18 @@
 
 (use-package company-box
   :hook (company-mode . company-box-mode))
+
+(use-package yasnippet
+  :after lsp-mode)
+
+#+end_src
+
+** Commenting lines
+
+#+begin_src emacs-lisp
+
+(use-package evil-nerd-commenter
+  :bind ("M-/" . evilnc-comment-or-uncomment-lines))
 
 #+end_src
 
