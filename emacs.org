@@ -202,7 +202,9 @@
      ("\\.ts\\'" . ng2-ts-mode))
     :hook
     ((ng2-html-mode . lsp-deferred)
-     (ng2-ts-mode . lsp-deferred)))
+     (ng2-ts-mode . lsp-deferred))
+    :custom
+    (typescript-indent-level 2))
 
 #+end_src
 
@@ -210,16 +212,17 @@
 
 #+begin_src emacs-lisp
 
+(setq gc-cons-threshold 100000000)
+(setq read-process-output-max (* 1024 1024)) ;; 1mb
+
 (use-package lsp-mode
   :commands (lsp lsp-deferred)
   :init
   (setq lsp-keymap-prefix "C-c l")
-  (setq gc-cons-threshold 100000000)
-  (setq read-process-output-max (* 1024 1024)) ;; 1mb
-  (setq lsp-file-watch-threshold 10000)
   :config
   (lsp-enable-which-key-integration t)
-)
+  (setq lsp-file-watch-threshold 10000)
+  (setq lsp-log-io nil))
 
 #+end_src
 
@@ -299,7 +302,7 @@
   (setq prettier-js-args
 	`(,(concat "--config " (concat rk/usq_api_path "/.prettierrc"))        ; this works if I only have one prettierrc file. Need a better solution
 	  "--write"))
-  :hook (js2-mode typescript-mode))
+  :hook (js2-mode ng2-ts-mode))
 
 #+end_src
 
