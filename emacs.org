@@ -185,18 +185,18 @@
 
 #+begin_src emacs-lisp
 
-(use-package js2-mode
-  :mode "\\.js\\'"
-  :hook (js2-mode . lsp-deferred)
-  :config
-  (setq js2-indent-level 2)
-  (setq electric-indent-inhibit t))
+  (use-package js2-mode
+    :mode "\\.js\\'"
+    :hook (js2-mode . lsp-deferred)
+    :config
+    (setq electric-indent-inhibit t)
+    (setq js-indent-level 2))
 
-(use-package json-mode
-  :config
-  (setq js-indent-level 2))
+  (use-package json-mode
+    :config
+    (setq js-indent-level 4))
 
-(use-package ng2-mode
+  (use-package ng2-mode
     :mode
     (("\\.html\\'" . ng2-html-mode)
      ("\\.ts\\'" . ng2-ts-mode))
@@ -226,6 +226,32 @@
 
 #+end_src
 
+** DAP mode for debugging
+
+#+begin_src emacs-lisp
+  (use-package general)
+  ;; required for the general-define-key func
+
+  (use-package dap-mode
+    :commands dap-debug
+    :config
+    ;; Node debugging
+    (require 'dap-node)
+    (dap-node-setup)
+    (require 'dap-chrome)
+    (dap-chrome-setup)
+    (dap-ui-mode 1)
+    ;; add dap-hydra to lsp mode prefixes
+    (general-define-key
+     :keymaps 'lsp-mode-map
+     :prefix lsp-keymap-prefix
+     "d" '(dap-hydra t :wk "debugger"))
+    :custom
+    ;; don't show all panes in debugger
+    (lsp-enable-dap-auto-configure nil))
+
+#+end_src
+
 ** Code completion with Company and Yasnippet
 
 #+begin_src emacs-lisp
@@ -235,7 +261,9 @@
   :hook (lsp-mode . company-mode)
   :bind
   (:map company-active-map
-	("<tab>" . company-complete-selection))
+	("<tab>" . company-complete-selection)
+    ("C-n" . company-select-next-or-abort)
+    ("C-p" . company-select-previous-or-abort))
   (:map lsp-mode-map
 	("<tab>" . company-indent-or-complete-common))
   :custom
@@ -266,7 +294,9 @@
 
 (use-package projectile
   :diminish
-  :config (projectile-mode)
+  :config
+  (projectile-mode)
+  (setq projectile-project-search-path '("~/Projects/"))
   :custom ((projectile-completion-system 'ivy))
   :bind-keymap
   ("C-c p" . projectile-command-map)
@@ -316,7 +346,6 @@ Only using org mode for documentation. Not yet for agendas etc.
   :hook (org-mode . rk/org-mode-setup)
   :config
   (setq org-ellipsis " ▼")
-  (setq org-src-preserve-indentation t)
   (rk/org-font-setup))
 
 
