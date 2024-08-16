@@ -180,7 +180,7 @@
 #+end_src
 
 * Development
-** Modes for languages
+** Angular modes
 
 #+begin_src emacs-lisp
   (setq-default indent-tabs-mode nil)
@@ -196,7 +196,7 @@
 
   (use-package json-mode
     :config
-    (setq js-indent-level 4))
+    (setq js-indent-level 2))
 
   (use-package ng2-mode
     :mode
@@ -219,6 +219,16 @@
             (setq tab-width 5))
 #+end_src
 
+** Python config
+
+#+begin_src emacs-lisp
+  (use-package elpy
+    :ensure t
+    :init
+    (elpy-enable)
+    :config
+    (setq python-indent-offset 2))
+#+end_src
 ** Language Servers
 
 #+begin_src emacs-lisp
