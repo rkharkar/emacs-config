@@ -80,24 +80,26 @@
 
 #+begin_src emacs-lisp
 
-(setq inhibit-startup-message t)                ; Disable startup message
-(add-hook 'window-setup-hook 'toggle-frame-maximized t) ; Start maximized
-(scroll-bar-mode -1)                            ; Disable visible scrollbar
-(tool-bar-mode -1)                              ; Disable toolbar
-(tooltip-mode -1)                               ; Disable tooltips
-(set-fringe-mode 10)                            ; Margins along the sides
-(menu-bar-mode -1)                              ; Remove menu bar
-(set-face-attribute 'default nil :height rk/default-font-size)   ; Font size
-(column-number-mode)                            ; Enable column numbers
-(global-display-line-numbers-mode t)            ; Enable line numbers
-(dolist (mode '(eshell-mode-hook                ; Disable line nums for
-		org-mode-hook                       ; some modes
-		shell-mode-hook
-		term-mode-hook))
-  (add-hook mode (lambda () (display-line-numbers-mode 0))))
+  (prefer-coding-system 'utf-8)
+  (setq inhibit-startup-message t)                ; Disable startup message
+  (setq split-width-threshold 1)                  ; Split windows horizontally by default
+  (add-hook 'window-setup-hook 'toggle-frame-maximized t) ; Start maximized
+  (scroll-bar-mode -1)                            ; Disable visible scrollbar
+  (tool-bar-mode -1)                              ; Disable toolbar
+  (tooltip-mode -1)                               ; Disable tooltips
+  (set-fringe-mode 10)                            ; Margins along the sides
+  (menu-bar-mode -1)                              ; Remove menu bar
+  (set-face-attribute 'default nil :height rk/default-font-size)   ; Font size
+  (column-number-mode)                            ; Enable column numbers
+  (global-display-line-numbers-mode t)            ; Enable line numbers
+  (dolist (mode '(eshell-mode-hook                ; Disable line nums for
+                  org-mode-hook                       ; some modes
+                  shell-mode-hook
+                  term-mode-hook))
+    (add-hook mode (lambda () (display-line-numbers-mode 0))))
 
-(use-package rainbow-delimiters
-  :hook (prog-mode . rainbow-delimiters-mode))
+  (use-package rainbow-delimiters
+    :hook (prog-mode . rainbow-delimiters-mode))
 
 #+end_src
 
@@ -229,6 +231,59 @@
     :config
     (setq python-indent-offset 2))
 #+end_src
+
+** R/Stats config
+
+#+begin_src emacs-lisp
+  (use-package flycheck
+    :ensure t
+    :hook (ess-r-mode . flycheck-mode)
+    )
+
+  (use-package ess
+    :mode "\\.r\\i'"
+    :hook (ess-r-mode . company-mode)
+    :config
+    (setq ess-R-font-lock-keywords
+                                        '((ess-R-fl-keyword:keywords . t)
+                                          (ess-R-fl-keyword:constants . t)
+                                          (ess-R-fl-keyword:modifiers . t)
+                                          (ess-R-fl-keyword:fun-defs . t)
+                                          (ess-R-fl-keyword:assign-ops . t)
+                                          (ess-R-fl-keyword:%op% . t)
+                                          (ess-fl-keyword:fun-calls . t)
+                                          (ess-fl-keyword:numbers . t)
+                                          (ess-fl-keyword:operators)
+                                          (ess-fl-keyword:delimiters)
+                                          (ess-fl-keyword:=)
+                                          (ess-R-fl-keyword:F&T . t)))
+    (setq ess-use-flymake nil)
+    (setq ess-use-company 'script-only)
+    (setq display-buffer-alist
+                '(("*R Dired"
+                   (display-buffer-reuse-window display-buffer-at-bottom)
+                   (window-width . 0.5)
+                   (window-height . 0.25)
+                   (reusable-frames . nil))
+                  ("*R"
+                   (display-buffer-reuse-window display-buffer-in-side-window)
+                   (side . right)
+                   (slot . -1)
+                   (window-width . 0.5)
+                   (reusable-frames . nil))
+                  ("*Help"
+                   (display-buffer-reuse-window display-buffer-in-side-window)
+                   (side . right)
+                   (slot . 1)
+                   (window-width . 0.5)
+                   (reusable-frames . nil))))
+    :bind (([f9] . ess-rdired)
+                 ([f12] . company-R-args)))
+
+  (use-package company-quickhelp
+    :hook (ess-r-mode . company-quickhelp-mode))
+#+end_src
+
 ** Language Servers
 
 #+begin_src emacs-lisp
@@ -277,25 +332,25 @@
 
 #+begin_src emacs-lisp
 
-(use-package company
-  :after lsp-mode
-  :hook (lsp-mode . company-mode)
-  :bind
-  (:map company-active-map
-	("<tab>" . company-complete-selection)
-    ("C-n" . company-select-next-or-abort)
-    ("C-p" . company-select-previous-or-abort))
-  (:map lsp-mode-map
-	("<tab>" . company-indent-or-complete-common))
-  :custom
-  (company-minimum-prefix-length 1)
-  (company-idle-delay 0.0))
+  (use-package company
+    :after (lsp-mode)
+    :hook (lsp-mode . company-mode)
+    :bind
+    (:map company-active-map
+          ("<tab>" . company-complete-selection)
+      ("C-n" . company-select-next-or-abort)
+      ("C-p" . company-select-previous-or-abort))
+    (:map lsp-mode-map
+          ("<tab>" . company-indent-or-complete-common))
+    :custom
+    (company-minimum-prefix-length 1)
+    (company-idle-delay 0.0))
 
-(use-package company-box
-  :hook (company-mode . company-box-mode))
+  (use-package company-box
+    :hook (company-mode . company-box-mode))
 
-(use-package yasnippet
-  :after lsp-mode)
+  (use-package yasnippet
+    :after lsp-mode)
 
 #+end_src
 
