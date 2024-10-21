@@ -224,12 +224,9 @@
 ** Python config
 
 #+begin_src emacs-lisp
-  (use-package elpy
-    :ensure t
-    :init
-    (elpy-enable)
-    :config
-    (setq python-indent-offset 2))
+  (use-package python-mode
+    :hook ((python-mode . company-mode)
+           (python-mode . electric-pair-mode)))
 #+end_src
 
 ** R/Stats config
@@ -242,43 +239,48 @@
 
   (use-package ess
     :mode "\\.r\\i'"
-    :hook (ess-r-mode . company-mode)
+    :hook ((ess-r-mode . company-mode)
+		    (ess-r-mode . electric-pair-mode))
     :config
     (setq ess-R-font-lock-keywords
-                                        '((ess-R-fl-keyword:keywords . t)
-                                          (ess-R-fl-keyword:constants . t)
-                                          (ess-R-fl-keyword:modifiers . t)
-                                          (ess-R-fl-keyword:fun-defs . t)
-                                          (ess-R-fl-keyword:assign-ops . t)
-                                          (ess-R-fl-keyword:%op% . t)
-                                          (ess-fl-keyword:fun-calls . t)
-                                          (ess-fl-keyword:numbers . t)
-                                          (ess-fl-keyword:operators)
-                                          (ess-fl-keyword:delimiters)
-                                          (ess-fl-keyword:=)
-                                          (ess-R-fl-keyword:F&T . t)))
+		   '((ess-R-fl-keyword:keywords . t)
+		  (ess-R-fl-keyword:constants . t)
+		  (ess-R-fl-keyword:modifiers . t)
+		  (ess-R-fl-keyword:fun-defs . t)
+		  (ess-R-fl-keyword:assign-ops . t)
+		  (ess-R-fl-keyword:%op% . t)
+		  (ess-fl-keyword:fun-calls . t)
+		  (ess-fl-keyword:numbers . t)
+		  (ess-fl-keyword:operators)
+		  (ess-fl-keyword:delimiters)
+		  (ess-fl-keyword:=)
+		  (ess-R-fl-keyword:F&T . t)))
     (setq ess-use-flymake nil)
     (setq ess-use-company 'script-only)
     (setq display-buffer-alist
-                '(("*R Dired"
-                   (display-buffer-reuse-window display-buffer-at-bottom)
-                   (window-width . 0.5)
-                   (window-height . 0.25)
-                   (reusable-frames . nil))
-                  ("*R"
-                   (display-buffer-reuse-window display-buffer-in-side-window)
-                   (side . right)
-                   (slot . -1)
-                   (window-width . 0.5)
-                   (reusable-frames . nil))
-                  ("*Help"
-                   (display-buffer-reuse-window display-buffer-in-side-window)
-                   (side . right)
-                   (slot . 1)
-                   (window-width . 0.5)
-                   (reusable-frames . nil))))
+		   '(("*R Dired"
+		   (display-buffer-reuse-window display-buffer-at-bottom)
+		   (window-width . 0.5)
+		   (window-height . 0.25)
+		   (reusable-frames . nil))
+		  ("*R"
+		   (display-buffer-reuse-window display-buffer-in-side-window)
+		   (side . right)
+		   (slot . -1)
+		   (window-width . 0.5)
+		   (reusable-frames . nil))
+		  ("*Help"
+		   (display-buffer-reuse-window display-buffer-in-side-window)
+		   (side . right)
+		   (slot . 1)
+		   (window-width . 0.5)
+		   (reusable-frames . nil))))
     :bind (([f9] . ess-rdired)
-                 ([f12] . company-R-args)))
+		    ([f12] . company-R-args)
+		    :map company-active-map
+		    ("<return>" . nil)
+		    ("<tab>" . company-complete-common)
+		    ("<M-tab>" . company-complete-selection)))
 
   (use-package company-quickhelp
     :hook (ess-r-mode . company-quickhelp-mode))
