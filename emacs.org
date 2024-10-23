@@ -224,9 +224,13 @@
 ** Python config
 
 #+begin_src emacs-lisp
+  (use-package py-autopep8
+    :hook (python-mode . py-autopep8-mode))
+
   (use-package python-mode
     :hook ((python-mode . company-mode)
-           (python-mode . electric-pair-mode)))
+           (python-mode . electric-pair-mode)
+           (python-mode . flymake-mode)))
 #+end_src
 
 ** R/Stats config
