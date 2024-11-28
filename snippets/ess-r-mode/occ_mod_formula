@@ -1,0 +1,9 @@
+# -*- mode: snippet -*-
+# name: Occupancy model formula
+# key: <occform
+# --
+
+c(
+  as.formula("psi ~ $0"),
+  as.formula("p ~ ")
+)
