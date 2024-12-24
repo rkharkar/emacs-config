@@ -4,6 +4,6 @@
 # --
 
 c(
-  as.formula("psi ~ $0"),
-  as.formula("p ~ ")
+  psi ~ $0,
+  p ~ 
 )
