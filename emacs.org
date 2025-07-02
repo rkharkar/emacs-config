@@ -191,13 +191,10 @@
     :mode "\\.js\\'"
     :hook
     ((js2-mode . lsp-deferred)
-     (js2-mode . electric-pair-mode))
+     (js2-mode . electric-pair-mode)
+     (js2-mode . yas-minor-mode))
     :config
     (setq electric-indent-inhibit t)
-    (setq js-indent-level 2))
-
-  (use-package json-mode
-    :config
     (setq js-indent-level 2))
 
   (use-package ng2-mode
@@ -208,17 +205,39 @@
     ((ng2-html-mode . lsp-deferred)
      (ng2-html-mode . electric-pair-mode)
      (ng2-ts-mode . lsp-deferred)
-     (ng2-ts-mode . electric-pair-mode))
+     (ng2-ts-mode . electric-pair-mode)
+     (ng2-ts-mode . yas-minor-mode)
+     (ng2-html-mode . yas-minor-mode))
     :custom
     (typescript-indent-level 2))
+#+end_src
 
+** Markdown mode
+
+#+begin_src emacs-lisp
   (use-package markdown-mode
     :hook
-    (markdown-mode . visual-line-mode))
+    (markdown-mode . visual-line-mode)
+    :config
+    (setq markdown-command "pandoc -t html5"))
+#+end_src
 
-  (add-hook 'sql-mode-hook
-            (setq indent-tabs-mode t)
-            (setq tab-width 5))
+** CSS mode
+
+#+begin_src emacs-lisp
+  (use-package css-mode
+    :hook
+    (css-mode . company-mode)
+    :config
+    (setq css-indent-offset 2))
+#+end_src
+
+** JSON mode
+
+#+begin_src emacs-lisp
+  (use-package json-mode
+    :config
+    (setq js-indent-level 2))
 #+end_src
 
 ** Python config
@@ -294,6 +313,22 @@
 
   (use-package company-quickhelp
     :hook (ess-r-mode . company-quickhelp-mode))
+#+end_src
+
+** Julia Mode
+
+#+begin_src emacs-lisp
+  (use-package vterm
+    :ensure t)
+
+  (use-package julia-snail
+    :ensure t
+    :hook ((julia-mode . julia-snail-mode)
+           (julia-snail-mode . company-mode)
+           (julia-snail-mode . electric-pair-mode))
+    :init
+    (add-to-list 'display-buffer-alist
+                 '("\\*julia" (display-buffer-reuse-window display-buffer-same-window))))
 #+end_src
 
 ** Language Servers
