@@ -182,6 +182,11 @@
 #+end_src
 
 * Development
+** Emmet mode
+#+begin_src emacs-lisp
+  (use-package emmet-mode
+    :mode "\\.html\\")
+#+end_src
 ** Angular modes
 
 #+begin_src emacs-lisp
@@ -211,7 +216,6 @@
     :custom
     (typescript-indent-level 2))
 #+end_src
-
 ** Markdown mode
 
 #+begin_src emacs-lisp
