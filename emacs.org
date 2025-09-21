@@ -5,81 +5,73 @@
 ** Variables
 
 #+begin_src emacs-lisp
+  (defvar rk/default-font-size 120)
 
-(defvar rk/default-font-size 120)
-
-(defvar rk/usq_api_path "/home/dev/Projects/usq/usq_api")
-
+  (defvar rk/usq_api_path (file-truename "~/Projects/usq/usq_api"))
 #+end_src
 
 ** Functions
 
 #+begin_src emacs-lisp
+  (defun rk/org-font-setup ()
+    ;; Replace list hyphen with dot in org mode
+    (font-lock-add-keywords 'org-mode
+  			  '(("^ *\\([-]\\) "
+  			     (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
 
-(defun rk/org-font-setup ()
-  ;; Replace list hyphen with dot in org mode
-  (font-lock-add-keywords 'org-mode
-			  '(("^ *\\([-]\\) "
-			     (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
+    ;; Set faces for heading levels
+    (dolist (face '((org-level-1 . 1.2)
+  		  (org-level-2 . 1.1)
+  		  (org-level-3 . 1.05)
+  		  (org-level-4 . 1.0)
+  		  (org-level-5 . 1.1)
+  		  (org-level-6 . 1.1)
+  		  (org-level-7 . 1.1)
+  		  (org-level-8 . 1.1)))))
 
-  ;; Set faces for heading levels
-  (dolist (face '((org-level-1 . 1.2)
-		  (org-level-2 . 1.1)
-		  (org-level-3 . 1.05)
-		  (org-level-4 . 1.0)
-		  (org-level-5 . 1.1)
-		  (org-level-6 . 1.1)
-		  (org-level-7 . 1.1)
-		  (org-level-8 . 1.1)))))
+  (defun rk/org-babel-tangle-config ()
+    ;; Automatically generate init file on save
+    (when (string-equal (buffer-file-name)
+  		      (expand-file-name "~/Projects/emacs-config/emacs.org"))
+      ;; Dynamic scoping to the rescue
+      (let ((org-confirm-babel-evaluate nil))
+        (org-babel-tangle))))
 
-(defun rk/org-mode-setup ()
-  ;; Fix org mode indentation and line wrapping
-  (org-indent-mode)
-  (visual-line-mode 1))
-
-(defun rk/org-babel-tangle-config ()
-  ;; Automatically generate init file on save
-  (when (string-equal (buffer-file-name)
-		      (expand-file-name "~/Projects/emacs-config/emacs.org"))
-    ;; Dynamic scoping to the rescue
-    (let ((org-confirm-babel-evaluate nil))
-      (org-babel-tangle))))
-
+  (defun rk/org-mode-setup ()
+    ;; Fix org mode indentation and line wrapping
+    (org-indent-mode)
+    (visual-line-mode 1)
+    (add-hook 'after-save-hook #'rk/org-babel-tangle-config nil t))
 #+end_src
 
 * Package sources
 ** Package archives
 
 #+begin_src emacs-lisp
+  (require 'package)
 
-(require 'package)
+  (setq package-archives '(("melpa" . "https://melpa.org/packages/")
+  			 ("elpa" . "https://elpa.gnu.org/packages/")))
 
-(setq package-archives '(("melpa" . "https://melpa.org/packages/")
-			 ("elpa" . "https://elpa.gnu.org/packages/")))
-
-(package-initialize)
-(unless package-archive-contents
-  (package-refresh-contents))
-
+  (package-initialize)
+  (unless package-archive-contents
+    (package-refresh-contents))
 #+end_src
    
 ** Activate use-package
 
 #+begin_src emacs-lisp
+  (unless (package-installed-p 'use-package)
+    (package-install 'use-package))
 
-(unless (package-installed-p 'use-package)
-  (package-install 'use-package))
-
-(require 'use-package)
-(setq use-package-always-ensure t)
-
+  (require 'use-package)
+  (setq use-package-always-ensure t)
 #+end_src
 
 * Basic UI configuration
 ** Main buffer look
 
 #+begin_src emacs-lisp
-
   (prefer-coding-system 'utf-8)
   (setq inhibit-startup-message t)                ; Disable startup message
   (setq split-width-threshold 1)                  ; Split windows horizontally by default
@@ -100,92 +92,85 @@
 
   (use-package rainbow-delimiters
     :hook (prog-mode . rainbow-delimiters-mode))
-
 #+end_src
 
 ** Mode line
 
 #+begin_src emacs-lisp
+  (use-package all-the-icons)                     ; Icons for doom mode line
 
-(use-package all-the-icons)                     ; Icons for doom mode line
+  (use-package doom-modeline                      ; Enable doom mode line
+    :ensure t
+    :init (doom-modeline-mode 1))
 
-(use-package doom-modeline                      ; Enable doom mode line
-  :ensure t
-  :init (doom-modeline-mode 1))
-
-(use-package doom-themes                        ; Get more themes
-  :config
-  (load-theme 'doom-nord t))
-
+  (use-package doom-themes                        ; Get more themes
+    :config
+    (load-theme 'doom-nord t))
 #+end_src
 
 * Mini-buffer completion
 ** Ivy and counsel for alternative completion
 
 #+begin_src emacs-lisp
+  ;; Setup ivy (mini-buffer completion)
+  (use-package ivy
+    :diminish
+    :bind(("C-s" . swiper)
+  	:map ivy-minibuffer-map
+  	("TAB" . ivy-alt-done)
+  	("C-l" . ivy-alt-done)
+  	("C-n" . ivy-next-line)
+  	("C-p" . ivy-previous-line)
+  	:map ivy-switch-buffer-map
+  	("C-n" . ivy-next-line)
+  	("C-l" . ivy-done)
+  	("C-d" . ivy-switch-buffer-kill)
+  	:map ivy-reverse-i-search-map
+  	("C-p" . ivy-previous-line)
+  	("C-d" . ivy-reverse-i-search-kill))
+    :config
+    (ivy-mode 1))
 
-;; Setup ivy (mini-buffer completion)
-(use-package ivy
-  :diminish
-  :bind(("C-s" . swiper)
-	:map ivy-minibuffer-map
-	("TAB" . ivy-alt-done)
-	("C-l" . ivy-alt-done)
-	("C-n" . ivy-next-line)
-	("C-p" . ivy-previous-line)
-	:map ivy-switch-buffer-map
-	("C-n" . ivy-next-line)
-	("C-l" . ivy-done)
-	("C-d" . ivy-switch-buffer-kill)
-	:map ivy-reverse-i-search-map
-	("C-p" . ivy-previous-line)
-	("C-d" . ivy-reverse-i-search-kill))
-  :config
-  (ivy-mode 1))
+  ;; Completions for key bindings
+  (use-package which-key
+    :init (which-key-mode)
+    :diminish which-key-mode
+    :config
+    (setq which-key-idle-delay 2))
 
-;; Completions for key bindings
-(use-package which-key
-  :init (which-key-mode)
-  :diminish which-key-mode
-  :config
-  (setq which-key-idle-delay 2))
+  ;; Counsel required for ivy-rich. Also some basic setup
+  (use-package counsel
+    :bind (("M-x" . counsel-M-x)
+  	 ("C-x b" . counsel-ibuffer)
+  	 ("C-x C-f" . counsel-find-file)
+  	 :map minibuffer-local-map
+  	 ("C-r" . 'counsel-minibuffer-history)))
 
-;; Counsel required for ivy-rich. Also some basic setup
-(use-package counsel
-  :bind (("M-x" . counsel-M-x)
-	 ("C-x b" . counsel-ibuffer)
-	 ("C-x C-f" . counsel-find-file)
-	 :map minibuffer-local-map
-	 ("C-r" . 'counsel-minibuffer-history)))
-
-;; Descriptions of key bindings with M-x
-(use-package ivy-rich
-  :init
-  (ivy-rich-mode 1))
-
+  ;; Descriptions of key bindings with M-x
+  (use-package ivy-rich
+    :init
+    (ivy-rich-mode 1))
 #+end_src
 
 ** More verbose help
 
 #+begin_src emacs-lisp
-
-(use-package helpful
-  :custom
-  (counsel-describe-function-function #'helpful-callable)
-  (counsel-describe-variable-function #'helpful-variable)
-  :bind
-  ([remap describe-function] . counsel-describe-function)
-  ([remap describe-command] . helpful-command)
-  ([remap describe-variable] . counsel-describe-variable)
-  ([remap describe-key] . helpful-key))
-
+  (use-package helpful
+    :custom
+    (counsel-describe-function-function #'helpful-callable)
+    (counsel-describe-variable-function #'helpful-variable)
+    :bind
+    ([remap describe-function] . counsel-describe-function)
+    ([remap describe-command] . helpful-command)
+    ([remap describe-variable] . counsel-describe-variable)
+    ([remap describe-key] . helpful-key))
 #+end_src
 
 * Development
 ** Emmet mode
 #+begin_src emacs-lisp
   (use-package emmet-mode
-    :mode "\\.html\\")
+    :mode "\\.html\\'")
 #+end_src
 ** Angular modes
 
@@ -338,19 +323,17 @@
 ** Language Servers
 
 #+begin_src emacs-lisp
+  (setq gc-cons-threshold 100000000)
+  (setq read-process-output-max (* 1024 1024)) ;; 1mb
 
-(setq gc-cons-threshold 100000000)
-(setq read-process-output-max (* 1024 1024)) ;; 1mb
-
-(use-package lsp-mode
-  :commands (lsp lsp-deferred)
-  :init
-  (setq lsp-keymap-prefix "C-c l")
-  :config
-  (lsp-enable-which-key-integration t)
-  (setq lsp-file-watch-threshold 10000)
-  (setq lsp-log-io nil))
-
+  (use-package lsp-mode
+    :commands (lsp lsp-deferred)
+    :init
+    (setq lsp-keymap-prefix "C-c l")
+    :config
+    (lsp-enable-which-key-integration t)
+    (setq lsp-file-watch-threshold 10000)
+    (setq lsp-log-io nil))
 #+end_src
 
 ** DAP mode for debugging
@@ -415,17 +398,14 @@
 ** Commenting lines
 
 #+begin_src emacs-lisp
-
-(use-package evil-nerd-commenter
-  :bind ("M-/" . evilnc-comment-or-uncomment-lines))
-
+  (use-package evil-nerd-commenter
+    :bind ("M-/" . evilnc-comment-or-uncomment-lines))
 #+end_src
 
 * Project management tools
 ** Projectile for searching and moving between projects
 
 #+begin_src emacs-lisp
-
   (use-package projectile
     :diminish
     :config
@@ -443,42 +423,36 @@
   (use-package counsel-projectile
     :config (counsel-projectile-mode)
     :bind (("C-c s" . counsel-projectile-rg)))
-
 #+end_src
 
 ** Magit for easy access to git commands
 
 #+begin_src emacs-lisp
-
-(use-package magit
-  :custom
-  (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
-
+  (use-package magit
+    :custom
+    (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
 #+end_src
 
 ** Prettier for formatting js project files
 
 #+begin_src emacs-lisp
-
-(use-package prettier-js
-  :commands (prettier-js-mode)
-  :config
-  (setq prettier-js-command (concat rk/usq_api_path "/node_modules/.bin/prettier"))  ; cannot find local installation otherwise
-  (setq prettier-js-args
-	`(,(concat "--config " (concat rk/usq_api_path "/.prettierrc"))        ; this works if I only have one prettierrc file. Need a better solution
-	  "--write"))
-  :hook (js2-mode ng2-ts-mode))
-
+  (use-package prettier-js
+    :commands (prettier-js-mode)
+    :config
+    (setq prettier-js-command (concat rk/usq_api_path "/node_modules/.bin/prettier"))  ; cannot find local installation otherwise
+    (setq prettier-js-args
+  	`(,(concat "--config " (concat rk/usq_api_path "/.prettierrc"))        ; this works if I only have one prettierrc file. Need a better solution
+  	  "--write"))
+    :hook (js2-mode ng2-ts-mode))
 #+end_src
 
 * Org mode setup
-Only using org mode for documentation. Not yet for agendas etc.
 ** Customization
 
 #+begin_src emacs-lisp
-
   (use-package org
-    :hook (org-mode . rk/org-mode-setup)
+    :hook ((org-mode . rk/org-mode-setup)
+           (org-mode . electric-pair-mode))
     :config
     (setq org-ellipsis " ▼")
     (rk/org-font-setup)
@@ -499,25 +473,28 @@ Only using org mode for documentation. Not yet for agendas etc.
   (org-babel-do-load-languages
    'org-babel-load-languages
    '((js . t)))
-
 #+end_src
 
-** Auto-tangle org file
+** Org-roam
 
 #+begin_src emacs-lisp
-
-(add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook #'rk/org-babel-tangle-config)))
-
+  (use-package org-roam
+    :after org
+    :ensure t
+    :config
+    (setq org-roam-directory (file-truename "~/Documents/org-roam"))
+    (org-roam-db-autosync-mode 1)
+    (org-roam-setup))
 #+end_src
 
 * Auto-save/backup files outside projects
 
 #+begin_src emacs-lisp
-    (setq backup-by-copying t
-          backup-directory-alist
-          '(("." . "~/.emacs.d/.saves/"))
-          delete-old-versions t
-          kept-new-versions 6
-          kept-old-versions 2
-          version-control t)
+  (setq backup-by-copying t
+        backup-directory-alist
+        '(("." . "~/.emacs.d/.saves/"))
+        delete-old-versions t
+        kept-new-versions 6
+        kept-old-versions 2
+        version-control t)
 #+end_src
