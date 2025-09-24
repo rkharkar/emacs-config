@@ -320,6 +320,19 @@
                  '("\\*julia" (display-buffer-reuse-window display-buffer-same-window))))
 #+end_src
 
+** Java Mode
+#+begin_src emacs-lisp
+  (use-package java-mode
+      :ensure nil
+      :hook ((java-mode . lsp-deferred)
+             (java-mode . electric-pair-mode)
+             (java-mode . company-mode)
+             (java-mode . flycheck-mode))
+      :config
+      (setq c-basic-offset 4
+            tab-width 4
+            indent-tabs-mode nil))
+#+end_src
 ** Language Servers
 
 #+begin_src emacs-lisp
@@ -334,6 +347,29 @@
     (lsp-enable-which-key-integration t)
     (setq lsp-file-watch-threshold 10000)
     (setq lsp-log-io nil))
+
+  (use-package lsp-ui
+    :ensure t
+    :after lsp-mode
+    :config
+    (setq lsp-ui-sideline-enable t
+          lsp-ui-sideline-show-hover t
+          lsp-ui-doc-enable t
+          lsp-ui-doc-position 'bottom))
+
+  (use-package lsp-java
+    :ensure t
+    :after lsp-mode
+    :hook (java-mode . lsp-deferred)
+    :config
+    (setq lsp-java-configuration-runtimes
+          '[(:name "JavaSE-17" :path "/usr/lib/jvm/java-17-openjdk")])
+    (setq lsp-java-format-enabled t
+          lsp-java-vmargs '("-XX:+UseParallelGC" "-XX:GCTimeRatio=4"
+                           "-XX:AdaptiveSizePolicyWeight=90"
+                           "-Dsun.zip.disableMemoryMapping=true"
+                           "-Xmx2G" "-Xms100m")
+          lsp-java-debug nil))
 #+end_src
 
 ** DAP mode for debugging
@@ -359,30 +395,21 @@
     :custom
     ;; don't show all panes in debugger
     (lsp-enable-dap-auto-configure nil))
-
 #+end_src
 
 ** Code completion with Company and Yasnippet
 
 #+begin_src emacs-lisp
   (use-package company
-    :hook (ess-r-mode . company-mode)
+    :hook ((ess-r-mode . company-mode)
+           (lsp-mode . company-mode))
     :bind (([f12] . company-R-args)
            :map company-active-map
            ("<return>" . nil)
            ("<tab>" . company-complete-common)
-           ("<M-tab>" . company-complete-selection)))
-
-  (use-package company
-    :after (lsp-mode)
-    :hook (lsp-mode . company-mode)
-    :bind
-    (:map company-active-map
-          ("<tab>" . company-complete-selection)
-      ("C-n" . company-select-next-or-abort)
-      ("C-p" . company-select-previous-or-abort))
-    (:map lsp-mode-map
-          ("<tab>" . company-indent-or-complete-common))
+           ("<M-tab>" . company-complete-selection)
+           ("C-n" . company-select-next-or-abort)
+           ("C-p" . company-select-previous-or-abort))
     :custom
     (company-minimum-prefix-length 1)
     (company-idle-delay 0.0))
@@ -469,10 +496,12 @@
 
   (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
   (add-to-list 'org-structure-template-alist '("js" . "src js"))
+  (add-to-list 'org-structure-template-alist '("java" . "src java"))
 
   (org-babel-do-load-languages
    'org-babel-load-languages
-   '((js . t)))
+   '((js . t)
+     (java . t)))
 #+end_src
 
 ** Org-roam
