@@ -241,69 +241,6 @@
            (python-mode . flymake-mode)))
 #+end_src
 
-** R/Stats config
-
-#+begin_src emacs-lisp
-  (use-package flycheck
-    :ensure t
-    :hook (ess-r-mode . flycheck-mode)
-    :config
-    (setq flycheck-check-syntax-automatically '(save mode-enabled))
-    )
-
-  (use-package yasnippet
-    :ensure t
-    :hook ((ess-r-mode . yas-minor-mode)
-           (yas-minor-mode . yas-reload-all))
-    :config
-    (setq yas-snippet-dirs '("~/Projects/emacs-config/snippets")))
-
-  (use-package ess
-    :mode "\\.r\\i'"
-    :hook (ess-r-mode . electric-pair-mode)
-    :config
-    (setq ess-R-font-lock-keywords
-          '((ess-R-fl-keyword:keywords . t)
-            (ess-R-fl-keyword:constants . t)
-            (ess-R-fl-keyword:modifiers . t)
-            (ess-R-fl-keyword:fun-defs . t)
-            (ess-R-fl-keyword:assign-ops . t)
-            (ess-R-fl-keyword:%op% . t)
-            (ess-fl-keyword:fun-calls . t)
-            (ess-fl-keyword:numbers . t)
-            (ess-fl-keyword:operators)
-            (ess-fl-keyword:delimiters)
-            (ess-fl-keyword:=)
-            (ess-R-fl-keyword:F&T . t)))
-    (setq display-buffer-alist
-          '(("*R Dired"
-             (display-buffer-reuse-window display-buffer-at-bottom)
-             (window-width . 0.5)
-             (window-height . 0.25)
-             (reusable-frames . nil))
-            ("*R"
-             (display-buffer-reuse-window display-buffer-in-side-window)
-             (side . right)
-             (slot . -1)
-             (window-width . 0.5)
-             (reusable-frames . nil))
-            ("*Help"
-             (display-buffer-reuse-window display-buffer-in-side-window)
-             (side . right)
-             (slot . 1)
-             (window-width . 0.5)
-             (reusable-frames . nil))))
-    :custom
-    (ess-style 'DEFAULT)
-    (ess-indent-offset 2)
-    (ess-use-flymake nil)
-    (ess-use-company 'script-only)
-    :bind (([f9] . ess-rdired)))
-
-  (use-package company-quickhelp
-    :hook (ess-r-mode . company-quickhelp-mode))
-#+end_src
-
 ** Julia Mode
 
 #+begin_src emacs-lisp
@@ -322,12 +259,11 @@
 
 ** Java Mode
 #+begin_src emacs-lisp
-  (use-package java-mode
+  (use-package cc-mode
       :ensure nil
       :hook ((java-mode . lsp-deferred)
              (java-mode . electric-pair-mode)
-             (java-mode . company-mode)
-             (java-mode . flycheck-mode))
+             (java-mode . company-mode))
       :config
       (setq c-basic-offset 4
             tab-width 4
@@ -348,22 +284,13 @@
     (setq lsp-file-watch-threshold 10000)
     (setq lsp-log-io nil))
 
-  (use-package lsp-ui
-    :ensure t
-    :after lsp-mode
-    :config
-    (setq lsp-ui-sideline-enable t
-          lsp-ui-sideline-show-hover t
-          lsp-ui-doc-enable t
-          lsp-ui-doc-position 'bottom))
-
   (use-package lsp-java
     :ensure t
     :after lsp-mode
     :hook (java-mode . lsp-deferred)
     :config
-    (setq lsp-java-configuration-runtimes
-          '[(:name "JavaSE-17" :path "/usr/lib/jvm/java-17-openjdk")])
+    ;; (setq lsp-java-configuration-runtimes
+    ;;       '[(:name "JavaSE-17" :path "/usr/lib/jvm/java-17-openjdk")])
     (setq lsp-java-format-enabled t
           lsp-java-vmargs '("-XX:+UseParallelGC" "-XX:GCTimeRatio=4"
                            "-XX:AdaptiveSizePolicyWeight=90"
@@ -401,8 +328,7 @@
 
 #+begin_src emacs-lisp
   (use-package company
-    :hook ((ess-r-mode . company-mode)
-           (lsp-mode . company-mode))
+    :hook (lsp-mode . company-mode)
     :bind (([f12] . company-R-args)
            :map company-active-map
            ("<return>" . nil)
