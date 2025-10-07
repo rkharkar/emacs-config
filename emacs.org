@@ -187,19 +187,22 @@
     (setq electric-indent-inhibit t)
     (setq js-indent-level 2))
 
+  (use-package typescript-mode
+    :mode "\\.ts\\'"
+    :hook
+    ((typescript-mode . lsp-deferred)
+     (typsecript-mode . electric-pair-mode)
+     (typescript-mode . yas-minor-mode))
+    :custom
+    (typescript-indent-level 2))
+
   (use-package ng2-mode
     :mode
-    (("\\.html\\'" . ng2-html-mode)
-     ("\\.ts\\'" . ng2-ts-mode))
+    (("\\.html\\'" . ng2-html-mode))
     :hook
     ((ng2-html-mode . lsp-deferred)
      (ng2-html-mode . electric-pair-mode)
-     (ng2-ts-mode . lsp-deferred)
-     (ng2-ts-mode . electric-pair-mode)
-     (ng2-ts-mode . yas-minor-mode)
-     (ng2-html-mode . yas-minor-mode))
-    :custom
-    (typescript-indent-level 2))
+     (ng2-html-mode . yas-minor-mode)))
 #+end_src
 ** Markdown mode
 
