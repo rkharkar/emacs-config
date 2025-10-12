@@ -168,10 +168,14 @@
 
 * Development
 ** Emmet mode
+
 #+begin_src emacs-lisp
   (use-package emmet-mode
-    :mode "\\.html\\'")
+    :hook
+    ((html-mode . emmet-mode)
+     (ng2-html-mode . emmet-mode)))
 #+end_src
+
 ** Angular modes
 
 #+begin_src emacs-lisp
@@ -356,6 +360,15 @@
 #+begin_src emacs-lisp
   (use-package evil-nerd-commenter
     :bind ("M-/" . evilnc-comment-or-uncomment-lines))
+#+end_src
+
+** UML
+
+#+begin_src emacs-lisp
+  (use-package plantuml-mode
+    :mode "\\.plantuml'"
+    :custom
+    (plantuml-default-exec-mode 'jar))
 #+end_src
 
 * Project management tools
