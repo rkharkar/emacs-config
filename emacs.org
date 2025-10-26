@@ -184,8 +184,7 @@
     :mode "\\.js\\'"
     :hook
     ((js2-mode . lsp-deferred)
-     (js2-mode . electric-pair-mode)
-     (js2-mode . yas-minor-mode))
+     (js2-mode . electric-pair-mode))
     :config
     (setq electric-indent-inhibit t)
     (setq js-indent-level 2))
@@ -194,8 +193,7 @@
     :mode "\\.ts\\'"
     :hook
     ((typescript-mode . lsp-deferred)
-     (typsecript-mode . electric-pair-mode)
-     (typescript-mode . yas-minor-mode))
+     (typescript-mode . electric-pair-mode))
     :custom
     (typescript-indent-level 2))
 
@@ -205,7 +203,6 @@
     :hook
     ((ng2-html-mode . lsp-deferred)
      (ng2-html-mode . electric-pair-mode)
-     (ng2-html-mode . yas-minor-mode)
      (ng2-html-mode . emmet-mode)))
 #+end_src
 
@@ -278,7 +275,8 @@
     :config
     (lsp-enable-which-key-integration t)
     (setq lsp-file-watch-threshold 10000)
-    (setq lsp-log-io nil))
+    (setq lsp-log-io nil)
+    (setq lsp-signature-auto-activate nil))
 #+end_src
 
 ** DAP mode for debugging
@@ -324,10 +322,6 @@
 
   (use-package company-box
     :hook (company-mode . company-box-mode))
-
-  (use-package yasnippet
-    :after lsp-mode)
-
 #+end_src
 
 ** Commenting lines
