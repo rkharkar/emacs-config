@@ -172,8 +172,7 @@
 #+begin_src emacs-lisp
   (use-package emmet-mode
     :hook
-    ((html-mode . emmet-mode)
-     (ng2-html-mode . emmet-mode)))
+    ((html-mode . emmet-mode)))
 #+end_src
 
 ** Angular modes
@@ -206,8 +205,10 @@
     :hook
     ((ng2-html-mode . lsp-deferred)
      (ng2-html-mode . electric-pair-mode)
-     (ng2-html-mode . yas-minor-mode)))
+     (ng2-html-mode . yas-minor-mode)
+     (ng2-html-mode . emmet-mode)))
 #+end_src
+
 ** Markdown mode
 
 #+begin_src emacs-lisp
@@ -264,18 +265,6 @@
                  '("\\*julia" (display-buffer-reuse-window display-buffer-same-window))))
 #+end_src
 
-** Java Mode
-#+begin_src emacs-lisp
-  (use-package cc-mode
-      :ensure nil
-      :hook ((java-mode . lsp-deferred)
-             (java-mode . electric-pair-mode)
-             (java-mode . company-mode))
-      :config
-      (setq c-basic-offset 4
-            tab-width 4
-            indent-tabs-mode nil))
-#+end_src
 ** Language Servers
 
 #+begin_src emacs-lisp
@@ -290,20 +279,6 @@
     (lsp-enable-which-key-integration t)
     (setq lsp-file-watch-threshold 10000)
     (setq lsp-log-io nil))
-
-  (use-package lsp-java
-    :ensure t
-    :after lsp-mode
-    :hook (java-mode . lsp-deferred)
-    :config
-    ;; (setq lsp-java-configuration-runtimes
-    ;;       '[(:name "JavaSE-17" :path "/usr/lib/jvm/java-17-openjdk")])
-    (setq lsp-java-format-enabled t
-          lsp-java-vmargs '("-XX:+UseParallelGC" "-XX:GCTimeRatio=4"
-                           "-XX:AdaptiveSizePolicyWeight=90"
-                           "-Dsun.zip.disableMemoryMapping=true"
-                           "-Xmx2G" "-Xms100m")
-          lsp-java-debug nil))
 #+end_src
 
 ** DAP mode for debugging
@@ -439,11 +414,13 @@
   (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
   (add-to-list 'org-structure-template-alist '("js" . "src js"))
   (add-to-list 'org-structure-template-alist '("java" . "src java"))
+  (add-to-list 'org-structure-template-alist '("cc" . "src C"))
 
   (org-babel-do-load-languages
    'org-babel-load-languages
    '((js . t)
-     (java . t)))
+     (java . t)
+     (C . t)))
 #+end_src
 
 ** Org-roam
