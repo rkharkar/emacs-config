@@ -276,7 +276,7 @@
     (lsp-enable-which-key-integration t)
     (setq lsp-file-watch-threshold 10000)
     (setq lsp-log-io nil)
-    (setq lsp-signature-auto-activate nil))
+    (setq lsp-enable-snippet nil))
 #+end_src
 
 ** DAP mode for debugging
