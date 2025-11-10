@@ -85,7 +85,7 @@
   (column-number-mode)                            ; Enable column numbers
   (global-display-line-numbers-mode t)            ; Enable line numbers
   (dolist (mode '(eshell-mode-hook                ; Disable line nums for
-                  org-mode-hook                       ; some modes
+                  org-mode-hook                   ; some modes
                   shell-mode-hook
                   term-mode-hook))
     (add-hook mode (lambda () (display-line-numbers-mode 0))))
@@ -262,6 +262,19 @@
                  '("\\*julia" (display-buffer-reuse-window display-buffer-same-window))))
 #+end_src
 
+** Java Mode
+#+begin_src java
+  (use-package cc-mode
+   :ensure nil
+   :hook ((java-mode . lsp-deferred)
+          (java-mode . electric-pair-mode)
+          (java-mode . company-mode))
+   :config
+   (setq c-basic-offset 4
+    tab-width 4
+    indent-tabs-mode nil))
+#+end_src
+
 ** Language Servers
 
 #+begin_src emacs-lisp
@@ -277,6 +290,18 @@
     (setq lsp-file-watch-threshold 10000)
     (setq lsp-log-io nil)
     (setq lsp-enable-snippet nil))
+
+  (use-package lsp-java
+    :ensure t
+    :after lsp-mode
+    :hook (java-mode . lsp-deferred)
+    :config
+    (setq lsp-java-format-enable t
+          lsp-java-vmargs '("-XX:+UseParallelGC" "-XX:GCTimeRatio=4"
+                            "-XX:AdaptiveSizePolicyWeight=90"
+                            "-Dsun.zip.disableMemoryMapping=true"
+                            "-Xmx2G" "-Xms100m")
+          lsp-java-debug nil))
 #+end_src
 
 ** DAP mode for debugging
@@ -415,6 +440,10 @@
    '((js . t)
      (java . t)
      (C . t)))
+
+  (global-set-key (kbd "C-c o l") #'org-store-link)
+  (global-set-key (kbd "C-c o a") #'org-agenda)
+  (global-set-key (kbd "C-c o c") #'org-capture)
 #+end_src
 
 ** Org-roam
