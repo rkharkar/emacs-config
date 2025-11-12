@@ -263,7 +263,7 @@
 #+end_src
 
 ** Java Mode
-#+begin_src java
+#+begin_src emacs-lisp
   (use-package cc-mode
    :ensure nil
    :hook ((java-mode . lsp-deferred)
@@ -295,6 +295,22 @@
     :ensure t
     :after lsp-mode
     :hook (java-mode . lsp-deferred)
+    :init
+    ;; Parse CLASSPATH and combine with default lib pattern
+    (setq lsp-java-project-referenced-libraries
+          (vconcat
+           ;; Always include lib folders in projects
+           ["lib/**/*.jar"]
+           ;; Add all JARs from CLASSPATH environment variable
+           (when (getenv "CLASSPATH")
+             (let* ((classpath (getenv "CLASSPATH"))
+                    (paths (split-string classpath ":" t))
+                    (jar-files (seq-filter (lambda (path)
+                                             (and (not (string= path "."))
+                                                  (string-match-p "\\.jar$" path)
+                                                  (file-exists-p path)))
+                                           paths)))
+               jar-files))))
     :config
     (setq lsp-java-format-enable t
           lsp-java-vmargs '("-XX:+UseParallelGC" "-XX:GCTimeRatio=4"
