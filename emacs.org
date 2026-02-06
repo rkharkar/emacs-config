@@ -246,22 +246,6 @@
            (python-mode . flymake-mode)))
 #+end_src
 
-** Julia Mode
-
-#+begin_src emacs-lisp
-  (use-package vterm
-    :ensure t)
-
-  (use-package julia-snail
-    :ensure t
-    :hook ((julia-mode . julia-snail-mode)
-           (julia-snail-mode . company-mode)
-           (julia-snail-mode . electric-pair-mode))
-    :init
-    (add-to-list 'display-buffer-alist
-                 '("\\*julia" (display-buffer-reuse-window display-buffer-same-window))))
-#+end_src
-
 ** Java Mode
 #+begin_src emacs-lisp
   (use-package cc-mode
