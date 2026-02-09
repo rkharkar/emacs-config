@@ -454,9 +454,18 @@
     :custom
     (org-roam-directory "~/Documents/org-roam")
     (org-roam-completion-everywhere t)
+    (org-roam-dailies-directory "daily/")
+    (org-roam-dailies-capture-templates
+     '(("d" "default" entry
+        "* %?"
+        :target (file+head "%<%Y-%m-%d>.org"
+                           "#+title: %<%Y-%m-%d>\n"))))
     :bind (("C-c n l" . org-roam-buffer-toggle)
            ("C-c n f" . org-roam-node-find)
            ("C-c n i" . org-roam-node-insert)
+           ("C-c n d t" . org-roam-dailies-capture-today)
+           ("C-c n d g t" . org-roam-dailies-goto-today)
+           ("C-c n d g y" . org-roam-dailies-goto-yesterday)
            :map org-mode-map
            ("C-M-i" . completion-at-point))
     :config
