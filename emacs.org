@@ -6,8 +6,6 @@
 
 #+begin_src emacs-lisp
   (defvar rk/default-font-size 120)
-
-  (defvar rk/usq_api_path (file-truename "~/Projects/usq/usq_api"))
 #+end_src
 
 ** Functions
@@ -175,7 +173,7 @@
     ((html-mode . emmet-mode)))
 #+end_src
 
-** Angular modes
+** JS/TS modes
 
 #+begin_src emacs-lisp
   (setq-default indent-tabs-mode nil)
@@ -196,14 +194,6 @@
      (typescript-mode . electric-pair-mode))
     :custom
     (typescript-indent-level 2))
-
-  (use-package ng2-mode
-    :mode
-    (("\\.html\\'" . ng2-html-mode))
-    :hook
-    ((ng2-html-mode . lsp-deferred)
-     (ng2-html-mode . electric-pair-mode)
-     (ng2-html-mode . emmet-mode)))
 #+end_src
 
 ** Markdown mode
@@ -396,19 +386,6 @@
     (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
 #+end_src
 
-** Prettier for formatting js project files
-
-#+begin_src emacs-lisp
-  (use-package prettier-js
-    :commands (prettier-js-mode)
-    :config
-    (setq prettier-js-command (concat rk/usq_api_path "/node_modules/.bin/prettier"))  ; cannot find local installation otherwise
-    (setq prettier-js-args
-  	`(,(concat "--config " (concat rk/usq_api_path "/.prettierrc"))        ; this works if I only have one prettierrc file. Need a better solution
-  	  "--write"))
-    :hook (js2-mode ng2-ts-mode))
-#+end_src
-
 * Org mode setup
 ** Customization
 
@@ -419,8 +396,16 @@
     :config
     (setq org-ellipsis " ▼")
     (rk/org-font-setup)
+    (setq tab-width 8)
     (setq org-babel-js-function-wrapper
-          "process.stdout.write(require('util').inspect(function(){\n%s\n}(), { maxArrayLength: null, maxStringLength: null, breakLength: Infinity, compact: true }))"))
+          "process.stdout.write(require('util').inspect(function(){\n%s\n}(), { maxArrayLength: null, maxStringLength: null, breakLength: Infinity, compact: true }))")
+    (setq org-todo-keywords
+          '((sequence "TODO" "IN-PROGRESS" "DONE")))
+    (setq org-todo-keyword-faces
+          '(("TODO" :foreground "#E47373" :weight bold)
+            ("IN-PROGRESS" :foreground "#31E20E" :weight bold)
+            ("DONE" :foreground "#939A92" :weight bold))))
+
 
 
   (use-package org-bullets
