@@ -106,6 +106,16 @@
     (load-theme 'doom-nord t))
 #+end_src
 
+* Shell path config
+
+#+begin_src emacs-lisp
+  (use-package exec-path-from-shell
+    :ensure t
+    :config
+    (when (memq window-system '(mac ns x))
+      (exec-path-from-shell-initialize)))
+#+end_src
+
 * Mini-buffer completion
 ** Ivy and counsel for alternative completion
 
@@ -165,6 +175,7 @@
 #+end_src
 
 * Development
+
 ** Emmet mode
 
 #+begin_src emacs-lisp
@@ -227,13 +238,15 @@
 ** Python config
 
 #+begin_src emacs-lisp
-  (use-package py-autopep8
-    :hook (python-mode . py-autopep8-mode))
+    (use-package py-autopep8
+      :hook (python-mode . py-autopep8-mode))
 
-  (use-package python-mode
-    :hook ((python-mode . company-mode)
-           (python-mode . electric-pair-mode)
-           (python-mode . flymake-mode)))
+    (use-package python-mode
+      :hook (
+             (python-mode . lsp-deferred)
+             (python-mode . company-mode)
+             (python-mode . electric-pair-mode)
+             (python-mode . flymake-mode)))
 #+end_src
 
 ** Java Mode
@@ -263,7 +276,8 @@
     (lsp-enable-which-key-integration t)
     (setq lsp-file-watch-threshold 10000)
     (setq lsp-log-io nil)
-    (setq lsp-enable-snippet nil))
+    (setq lsp-enable-snippet nil)
+    (setq lsp-pylsp-server-command "~/Library/Python/3.9/bin/pylsp"))
 
   (use-package lsp-java
     :ensure t
@@ -355,6 +369,25 @@
     (plantuml-default-exec-mode 'jar))
 #+end_src
 
+** Terminal emulation
+
+#+begin_src emacs-lisp
+  (use-package vterm
+    :ensure t
+    :config
+    (setq vterm-max-scrollback 10000))
+#+end_src
+
+** Claude Code
+
+#+begin_src emacs-lisp
+  (use-package claude-code-ide
+    :vc (:url "https://github.com/manzaltu/claude-code-ide.el" :rev :newest)
+    :bind ("C-c C-'" . claude-code-ide-menu)
+    :config
+    (claude-code-ide-emacs-tools-setup))
+#+end_src
+
 * Project management tools
 ** Projectile for searching and moving between projects
 
@@ -400,11 +433,13 @@
     (setq org-babel-js-function-wrapper
           "process.stdout.write(require('util').inspect(function(){\n%s\n}(), { maxArrayLength: null, maxStringLength: null, breakLength: Infinity, compact: true }))")
     (setq org-todo-keywords
-          '((sequence "TODO" "IN-PROGRESS" "DONE")))
+          '((sequence "TODO" "IN-PROGRESS" "DONE" "WONT-DO")))
     (setq org-todo-keyword-faces
           '(("TODO" :foreground "#E47373" :weight bold)
             ("IN-PROGRESS" :foreground "#31E20E" :weight bold)
-            ("DONE" :foreground "#939A92" :weight bold))))
+            ("DONE" :foreground "#939A92" :weight bold)))
+    (setq org-agenda-files
+          (directory-files-recursively "~/Documents/org-roam/daily" "\\.org$")))
 
 
 
