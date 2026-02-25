@@ -437,7 +437,7 @@
     (setq org-babel-js-function-wrapper
           "process.stdout.write(require('util').inspect(function(){\n%s\n}(), { maxArrayLength: null, maxStringLength: null, breakLength: Infinity, compact: true }))")
     (setq org-todo-keywords
-          '((sequence "TODO" "IN-PROGRESS" "DONE" "WONT-DO")))
+          '((sequence "TODO" "IN-PROGRESS" "|" "DONE" "WONT-DO")))
     (setq org-todo-keyword-faces
           '(("TODO" :foreground "#E47373" :weight bold)
             ("IN-PROGRESS" :foreground "#31E20E" :weight bold)
